@@ -1,74 +1,62 @@
 import sys, pygame
 from pygame.color import Color
 
-
+from render import screen
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
-from entity import Player
 from space_map import Star
+from particles import ParticlePrinciple
+
+from entity_factory import all_sprites, alien_sprites, player, alien
 
 pygame.init()
 
-screen_title = "Koboldka"
-icon = pygame.image.load('resources/goblin.png')
-
 bg_color = Color(46, 79, 79)
 
-#player
-playerIcon = pygame.image.load('resources/spaceship.png')
-playerX = SCREEN_WIDTH/2 - playerIcon.get_width()/2
-#playerY = SCREEN_HEIGHT/2 - playerIcon.get_height()/2
-playerY = 480
-player_speed = 5
-player_move = 0
 
-
-
-#Set core display
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption(screen_title)
-pygame.display.set_icon(icon)
-
-#instantiate player
-
-
-all_sprites = pygame.sprite.Group()
-player = Player(playerIcon, player_speed, playerX, playerY)
-all_sprites.add(player)
-
-star_field = pygame.sprite.Group()
-for s in range(100):
-    star = Star()
-    star_field.add(star)
+#star_field = pygame.sprite.Group()
+#for s in range(100):
+#    star = Star()
+#    star_field.add(star)
 
 clock = pygame.time.Clock()
 
+#Partile tests
+particle1 = ParticlePrinciple(screen)
 
+PARTICLE_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(PARTICLE_EVENT, 40)
+player_move = 0
 #Core Game Loop
 while 1:
-
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player_move = -player.speed
+                player.player_move = -player.speed
             if event.key == pygame.K_RIGHT:
-                player_move = player.speed
+                player.player_move = player.speed
+            if event.key == pygame.K_SPACE:
+                player.shoot()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or pygame.K_RIGHT:
-                player_move = 0
+                player.player_move = 0
+        if event.type == PARTICLE_EVENT:
+            particle1.add_particles()
 
-    player.move(player_move,0)
+    player.check_hits(alien_sprites)
 
-    all_sprites.update()
-    star_field.update()
+
+    #star_field.update()
 
     # Draw / render
     screen.fill(bg_color)
 
+    all_sprites.update()
+    particle1.emit()
+
     clock.tick(30)
 
-    star_field.draw(screen)
+    #star_field.draw(screen)
     all_sprites.draw(screen)
 
 
