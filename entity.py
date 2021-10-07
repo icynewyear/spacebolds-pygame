@@ -7,13 +7,14 @@ from colors import *
 
 
 class SpaceEntity(pygame.sprite.Sprite):
-    def __init__(self, screen):
+    def __init__(self, engine, screen):
         pygame.sprite.Sprite.__init__(self)
         self.screen = screen
+        self.engine = engine
 
 class SpaceActor(SpaceEntity):
-    def __init__(self, screen, icon, speed, x, y):
-        SpaceEntity.__init__(self, screen)
+    def __init__(self, engine, screen, icon, speed, x, y):
+        SpaceEntity.__init__(self, engine, screen)
         self.image = icon
         self.speed = speed
         self.rect = self.image.get_rect()
@@ -51,13 +52,18 @@ class SpaceActor(SpaceEntity):
         self.bullet_manager.render()
 
 class Alien(SpaceActor):
-    def __init__(self, engine, screen, icon, speed, x, y):
-        SpaceActor.__init__(self, screen, icon, speed, x, y)
+    def __init__(self, engine, screen, icon, speed, fire_rate, x, y):
+        SpaceActor.__init__(self, engine, screen, icon, speed, x, y)
         self.direction = random.randint(0,1)
+        self.fire_rate = fire_rate
+        self.timer = fire_rate
 
     def shoot(self):
-        bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y+self.image.get_height(), 10, ALIEN_GUN)
-        self.bullet_manager.add_projectile(bullet)
+        if self.timer == self.fire_rate:
+            self.timer = 0
+            bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y+self.image.get_height(), 10, ALIEN_GUN)
+            self.bullet_manager.add_projectile(bullet)
+        else: self.timer+=1
 
     def move(self):
         if self.direction == 1:
@@ -68,29 +74,48 @@ class Alien(SpaceActor):
             if self.rect.x <= 0: self.direction = 1
         self.y_move_amount = random.randint(-self.speed*3,self.speed*3)
 
+    def check_hits(self):
+            for bullet in self.bullet_manager.projectiles:
+                if self.engine.player.rect.collidepoint((bullet.x,bullet.y)):
+                    self.bullet_manager.projectiles.remove(bullet)
+                    self.engine.player.hp -= 1
+
     def update(self):
         self.move()
         self.shoot()
+        self.check_hits()
         super().update()
 
 
 class Player(SpaceActor):
     def __init__(self, engine, screen, icon, speed, x, y):
-        SpaceActor.__init__(self, screen, icon, speed, x, y)
+        SpaceActor.__init__(self, engine, screen, icon, speed, x, y)
         self.player_move = 0
-        self.engine = engine
+        self._hp = 4
+        self.maxhp = 4
 
-        print(self.engine)
+    @property
+    def hp(self):
+        return self._hp
+
+    @hp.setter
+    def hp(self, value):
+        self._hp = max(0, min(value, self.maxhp))
+        if self._hp == 0:
+            self.die()
+
+    def die(self):
+        self.kill()
 
     def shoot(self):
         bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y, -10, PLAYER_GUN)
         self.bullet_manager.add_projectile(bullet)
 
     def check_hits(self):
-        for asprite in self.engine.alien_sprites:
+        for asprite in self.engine.alien_sprites.sprites():
             for bullet in self.bullet_manager.projectiles:
-                if bullet.rect.colliderect(asprite.rect):
-                    print(asprite)
+                if asprite.rect.collidepoint((bullet.x,bullet.y)):
+                    asprite.kill()
 
     def update(self):
         self.move(self.player_move,0)

@@ -6,7 +6,7 @@ class BulletManager():
     def __init__(self, screen):
         pygame.init()
         self.screen = screen
-        self.projectiles =[]
+        self.projectiles = []
 
     def add_projectile(self, projectile):
         self.projectiles.append(projectile)
@@ -49,7 +49,6 @@ class Bullet():
 
     def update(self):
         self.y += self.direction
-
 
     def remove(self):
         pass

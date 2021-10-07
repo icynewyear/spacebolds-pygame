@@ -24,7 +24,6 @@ class Engine():
     all_sprites = pygame.sprite.Group()
     alien_sprites = pygame.sprite.Group()
 
-
     def __init__(self):
         self.bg_color = Color(46, 79, 79)
         self.clock = pygame.time.Clock()
@@ -33,7 +32,7 @@ class Engine():
         pygame.time.set_timer(self.PARTICLE_EVENT, 40)
         self.player_move = 0
         self.player = Player(self, screen, self.playerIcon, self.player_speed, self.playerX, self.playerY)
-        self.alien = Alien(self, screen, self.alienIcon, self.alien_speed, self.alienX, self.alienY)
+        self.alien = Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY)
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.alien)
         self.alien_sprites.add(self.alien)
