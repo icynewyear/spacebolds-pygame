@@ -117,7 +117,13 @@ class Player(SpaceActor):
                 if asprite.rect.collidepoint((bullet.x,bullet.y)):
                     asprite.kill()
 
+    def renderHP(self):
+        pygame.draw.rect(self.screen, RED, (20,570,80,20))
+        pygame.draw.rect(self.screen, BLUE, (20,570,self.hp*20,20))
+
+
     def update(self):
+        self.renderHP()
         self.move(self.player_move,0)
         self.check_hits()
         super().update()
