@@ -57,6 +57,7 @@ class Alien(SpaceActor):
         self.direction = random.randint(0,1)
         self.fire_rate = fire_rate
         self.timer = fire_rate
+        self.y_timer = 0
 
     def shoot(self):
         if self.timer == self.fire_rate:
@@ -72,7 +73,13 @@ class Alien(SpaceActor):
         elif self.direction == 0:
             self.x_move_amount -= self.speed
             if self.rect.x <= 0: self.direction = 1
-        self.y_move_amount = random.randint(-self.speed*3,self.speed*3)
+        if self.y_timer >= 25:
+            self.y_move_amount = -5
+        if self.y_timer < 25:
+            self.y_move_amount = 5
+        if self.y_timer == 50: self.y_timer = 0
+        self.y_timer += 1
+
 
     def check_hits(self):
             for bullet in self.bullet_manager.projectiles:
@@ -91,8 +98,9 @@ class Player(SpaceActor):
     def __init__(self, engine, screen, icon, speed, x, y):
         SpaceActor.__init__(self, engine, screen, icon, speed, x, y)
         self.player_move = 0
-        self._hp = 4
-        self.maxhp = 4
+        self._hp = 10
+        self.maxhp = 10
+        self.dead = False
 
     @property
     def hp(self):
@@ -105,7 +113,11 @@ class Player(SpaceActor):
             self.die()
 
     def die(self):
-        self.kill()
+        if self.dead == False:
+            gameover_sound = pygame.mixer.Sound('resources/gameover.ogg')
+            gameover_sound.play()
+            self.kill()
+            self.dead = True
 
     def shoot(self):
         bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y, -10, PLAYER_GUN)
@@ -115,15 +127,17 @@ class Player(SpaceActor):
         for asprite in self.engine.alien_sprites.sprites():
             for bullet in self.bullet_manager.projectiles:
                 if asprite.rect.collidepoint((bullet.x,bullet.y)):
+                    self.bullet_manager.projectiles.remove(bullet)
                     asprite.kill()
 
     def renderHP(self):
-        pygame.draw.rect(self.screen, RED, (20,570,80,20))
+        pygame.draw.rect(self.screen, RED, (20,570,self.maxhp*20,20))
         pygame.draw.rect(self.screen, BLUE, (20,570,self.hp*20,20))
 
 
     def update(self):
-        self.renderHP()
-        self.move(self.player_move,0)
-        self.check_hits()
-        super().update()
+        if self.dead == False:
+            self.renderHP()
+            self.move(self.player_move,0)
+            self.check_hits()
+            super().update()

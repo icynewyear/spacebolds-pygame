@@ -6,6 +6,7 @@ from entity import Player, Alien
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from space_map import Star
 from particles import ParticlePrinciple
+from backgrounds import Background
 
 
 class Engine():
@@ -25,19 +26,28 @@ class Engine():
     alien_sprites = pygame.sprite.Group()
 
     def __init__(self):
+        #self.bg_image = Background(screen)
         self.bg_color = Color(46, 79, 79)
         self.clock = pygame.time.Clock()
         self.particle1 = ParticlePrinciple(screen)
         self.PARTICLE_EVENT = pygame.USEREVENT + 1
         pygame.time.set_timer(self.PARTICLE_EVENT, 40)
         self.player_move = 0
+        self.aliens = []
         self.player = Player(self, screen, self.playerIcon, self.player_speed, self.playerX, self.playerY)
-        self.alien = Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY)
         self.all_sprites.add(self.player)
-        self.all_sprites.add(self.alien)
-        self.alien_sprites.add(self.alien)
+
+
+    def make_aliens(self, num):
+        for x in range(num):
+            print(x)
+            self.aliens.append(Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY-((x+1)*30)))
+            self.all_sprites.add(self.aliens[x])
+            self.alien_sprites.add(self.aliens[x])
 
     def run_game(self):
+        self.make_aliens(4)
+
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
@@ -56,6 +66,9 @@ class Engine():
 
             # Draw / render
             screen.fill(self.bg_color)
+
+            #self.bg_image.update()
+            #self.bg_image.render()
 
             self.all_sprites.update()
             self.particle1.emit()
