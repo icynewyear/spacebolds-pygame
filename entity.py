@@ -2,6 +2,7 @@ import pygame, random
 
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from projectiles import Bullet, BulletManager
+from entity_factory import alien_sprites
 from colors import *
 
 
@@ -82,7 +83,7 @@ class Player(SpaceActor):
         bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y, -10, PLAYER_GUN)
         self.bullet_manager.add_projectile(bullet)
 
-    def check_hits(self, alien_sprites):
+    def check_hits(self):
         for asprite in alien_sprites:
             for bullet in self.bullet_manager.projectiles:
                 if bullet.rect.colliderect(asprite.rect):

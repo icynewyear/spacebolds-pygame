@@ -20,11 +20,16 @@ alien_speed = 1
 
 all_sprites = pygame.sprite.Group()
 alien_sprites = pygame.sprite.Group()
-player_bullets = pygame.sprite.Group()
 
 player = Player(screen, playerIcon, player_speed, playerX, playerY)
 alien = Alien(screen, alienIcon, alien_speed, alienX, alienY)
+alien2 = Alien(screen, alienIcon, alien_speed, alienX+100, alienY-30)
+alien3 = Alien(screen, alienIcon, alien_speed, alienX-100, alienY)
 
 all_sprites.add(player)
 all_sprites.add(alien)
+all_sprites.add(alien2)
+all_sprites.add(alien3)
 alien_sprites.add(alien)
+alien_sprites.add(alien2)
+alien_sprites.add(alien3)

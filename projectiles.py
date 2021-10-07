@@ -32,9 +32,8 @@ class BulletManager():
                     trimmed_projectiles.append(projectile)
             self.projectiles = trimmed_projectiles
 
-class Bullet(pygame.sprite.Sprite):
+class Bullet():
     def __init__(self, manager, x, y, direction, color):
-        pygame.sprite.Sprite.__init__(self)
         self.manager = manager
         self.x = x
         self.y = y
