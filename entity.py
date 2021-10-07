@@ -2,7 +2,7 @@ import pygame, random
 
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from projectiles import Bullet, BulletManager
-from entity_factory import alien_sprites
+#from entity_factory import alien_sprites
 from colors import *
 
 
@@ -51,7 +51,7 @@ class SpaceActor(SpaceEntity):
         self.bullet_manager.render()
 
 class Alien(SpaceActor):
-    def __init__(self, screen, icon, speed, x, y):
+    def __init__(self, engine, screen, icon, speed, x, y):
         SpaceActor.__init__(self, screen, icon, speed, x, y)
         self.direction = random.randint(0,1)
 
@@ -75,20 +75,24 @@ class Alien(SpaceActor):
 
 
 class Player(SpaceActor):
-    def __init__(self, screen, icon, speed, x, y):
+    def __init__(self, engine, screen, icon, speed, x, y):
         SpaceActor.__init__(self, screen, icon, speed, x, y)
         self.player_move = 0
+        self.engine = engine
+
+        print(self.engine)
 
     def shoot(self):
         bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y, -10, PLAYER_GUN)
         self.bullet_manager.add_projectile(bullet)
 
     def check_hits(self):
-        for asprite in alien_sprites:
+        for asprite in self.engine.alien_sprites:
             for bullet in self.bullet_manager.projectiles:
                 if bullet.rect.colliderect(asprite.rect):
                     print(asprite)
 
     def update(self):
         self.move(self.player_move,0)
+        self.check_hits()
         super().update()
