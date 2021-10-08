@@ -4,6 +4,7 @@ from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from projectiles import Bullet, BulletManager
 #from entity_factory import alien_sprites
 from colors import *
+from flightpatterns import Flightpath
 
 
 class SpaceEntity(pygame.sprite.Sprite):
@@ -27,9 +28,11 @@ class SpaceActor(SpaceEntity):
     def move(self, x_amount, y_amount):
         self.x_move_amount = x_amount
         self.y_move_amount = y_amount
+        return (x_amount,y_amount)
 
-    def do_movement(self):
+    def do_movement(self, move):
         #X move
+        x,y = move
         self.rect.x += self.x_move_amount
         if self.rect.x < 0:
             self.rect.x = 0
@@ -47,7 +50,7 @@ class SpaceActor(SpaceEntity):
         pass
 
     def update(self):
-        self.do_movement()
+        self.do_movement(self.move(self.x_move_amount, self.y_move_amount))
         self.bullet_manager.update()
         self.bullet_manager.render()
 
@@ -58,6 +61,7 @@ class Alien(SpaceActor):
         self.fire_rate = fire_rate
         self.timer = fire_rate
         self.y_timer = 0
+        self.fp = Flightpath((0,200))
 
     def shoot(self):
         if self.timer == self.fire_rate:
@@ -66,20 +70,34 @@ class Alien(SpaceActor):
             self.bullet_manager.add_projectile(bullet)
         else: self.timer+=1
 
-    def move(self):
-        if self.direction == 1:
-            self.x_move_amount += self.speed
-            if self.rect.x >= SCREEN_WIDTH-self.image.get_width(): self.direction = 0
-        elif self.direction == 0:
-            self.x_move_amount -= self.speed
-            if self.rect.x <= 0: self.direction = 1
-        if self.y_timer >= 25:
-            self.y_move_amount = -5
-        if self.y_timer < 25:
-            self.y_move_amount = 5
-        if self.y_timer == 50: self.y_timer = 0
-        self.y_timer += 1
+    # def move(self):
+    #     x_amount = 0
+    #     y_amount = 0
+    #     if self.direction == 1:
+    #         x_amount = self.speed
+    #         if self.rect.x >= SCREEN_WIDTH-self.image.get_width(): self.direction = 0
+    #     elif self.direction == 0:
+    #         x_amount = -self.speed
+    #         if self.rect.x <= 0: self.direction = 1
+    #     if self.y_timer >= 25:
+    #         y_amount = -5
+    #     if self.y_timer < 25:
+    #         y_amount = 5
+    #     if self.y_timer == 50: self.y_timer = 0
+    #     self.y_timer += 1
+    #     return (x_amount,y_amount)
 
+    def move(self):
+        move = next(self.fp)
+        return move
+
+    def do_movement(self, move):
+        #X move
+        x,y = move
+        self.rect.x += x
+        #Y move
+        self.rect.y += y
+        pass
 
     def check_hits(self):
             for bullet in self.bullet_manager.projectiles:
@@ -91,7 +109,9 @@ class Alien(SpaceActor):
         self.move()
         self.shoot()
         self.check_hits()
-        super().update()
+        self.do_movement(self.move())
+        self.bullet_manager.update()
+        self.bullet_manager.render()
 
 
 class Player(SpaceActor):

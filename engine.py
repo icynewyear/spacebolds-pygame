@@ -8,6 +8,8 @@ from space_map import Star
 from particles import ParticlePrinciple
 from backgrounds import Background
 
+from debug import debug
+
 
 class Engine():
     #player
@@ -40,7 +42,6 @@ class Engine():
 
     def make_aliens(self, num):
         for x in range(num):
-            print(x)
             self.aliens.append(Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY-((x+1)*30)))
             self.all_sprites.add(self.aliens[x])
             self.alien_sprites.add(self.aliens[x])
