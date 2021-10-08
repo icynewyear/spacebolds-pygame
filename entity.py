@@ -61,7 +61,7 @@ class Alien(SpaceActor):
         self.fire_rate = fire_rate
         self.timer = fire_rate
         self.y_timer = 0
-        self.fp = Flightpath((0,200))
+        self.fp = Flightpath((0,300))
 
     def shoot(self):
         if self.timer == self.fire_rate:

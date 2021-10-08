@@ -20,9 +20,9 @@ class Engine():
 
     #Enemy
     alienIcon = pygame.transform.flip(pygame.image.load('resources/enemy.png'), False, True)
-    alienX = SCREEN_WIDTH/2 - alienIcon.get_width()/2
+    alienX = (SCREEN_WIDTH/2 - alienIcon.get_width()/2)-400
     alienY = 100
-    alien_speed = 1
+    alien_speed = 2
 
     all_sprites = pygame.sprite.Group()
     alien_sprites = pygame.sprite.Group()
@@ -42,12 +42,12 @@ class Engine():
 
     def make_aliens(self, num):
         for x in range(num):
-            self.aliens.append(Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY-((x+1)*30)))
+            self.aliens.append(Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX+((x+1)*100), self.alienY))
             self.all_sprites.add(self.aliens[x])
             self.alien_sprites.add(self.aliens[x])
 
     def run_game(self):
-        self.make_aliens(4)
+        self.make_aliens(5)
 
         while 1:
             for event in pygame.event.get():
