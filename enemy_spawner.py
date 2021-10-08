@@ -13,7 +13,12 @@ class EnemySpawner(pygame.sprite.Sprite):
         return next(self.generator_iterator)
 
     def spawn_enemy(self):
+        current_timer = 0
         while self.num_to_spawn > 0 or self.num_to_spawn == -1:
             new_enemy = self.enemy
-            yield new_enemy
-            if self.num_to_spawn != -1: self.num_to_spawn -= 1
+            if current_timer == self.delay:
+                current_timer = 0
+                yield new_enemy
+                if self.num_to_spawn != -1: self.num_to_spawn -= 1
+            else:
+                current_timer += 1
