@@ -1,17 +1,21 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Tuple, Iterator
+
 import pygame
 
 from debug import debug
 
 class Flightpath():
-    def __init__(self, speed = 1, timer = (0,0)):
+    def __init__(self, speed: int = 1, timer: Tuple[int,int] = (0,0)):
         self.speed = speed
         self.timer = timer
         self.generator_iterator = self.step()
 
-    def __next__(self):
+    def __next__(self) -> Tuple[int,int]:
         return next(self.generator_iterator)
 
-    def step(self):
+    def step(self) -> Iterator[Tuple[int,int]]:
         current_timer, max_timer = self.timer
 
         x = -(self.speed)
