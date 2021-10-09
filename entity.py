@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, Union
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -32,32 +32,10 @@ class SpaceActor(SpaceEntity):
         self.y_move_amount = 0.0
         self.bullet_manager = BulletManager(self.engine)
 
-    def move(self, x_amount: int, y_amount: int) -> Tuple[int,int]:
-        self.x_move_amount = x_amount
-        self.y_move_amount = y_amount
-        return (x_amount,y_amount)
-
-    def do_movement(self, move: Tuple[int,int]) -> None:
-        #X move
-        x,y = move
-        self.rect.x += self.x_move_amount
-        if self.rect.x < 0:
-            self.rect.x = 0
-        elif self.rect.x > SCREEN_WIDTH-self.image.get_width():
-            self.rect.x = SCREEN_WIDTH-self.image.get_width()
-
-        #Y move
-        self.rect.y += self.y_move_amount
-        if self.rect.y < 0:
-            self.rect.y = 0
-        elif self.rect.y > SCREEN_HEIGHT-self.image.get_height():
-            self.rect.y = SCREEN_HEIGHT-self.image.get_height()
-
     def shoot(self) -> None:
         pass
 
     def update(self) -> None:
-        self.do_movement(self.move(self.x_move_amount, self.y_move_amount))
         self.bullet_manager.update()
         self.bullet_manager.render()
 
@@ -151,9 +129,30 @@ class Player(SpaceActor):
         pygame.draw.rect(self.screen, RED, (20,570,self.maxhp*20,20))
         pygame.draw.rect(self.screen, BLUE, (20,570,self.hp*20,20))
 
+    def move(self, x_amount: float, y_amount: float) -> Tuple[float,float]:
+        self.x_move_amount = x_amount
+        self.y_move_amount = y_amount
+        return (x_amount,y_amount)
+
+    def do_movement(self, move: Tuple[float,float]) -> None:
+        #X move
+        x,y = move
+        self.rect.x += self.x_move_amount
+        if self.rect.x < 0:
+            self.rect.x = 0
+        elif self.rect.x > SCREEN_WIDTH-self.image.get_width():
+            self.rect.x = SCREEN_WIDTH-self.image.get_width()
+
+        #Y move
+        self.rect.y += self.y_move_amount
+        if self.rect.y < 0:
+            self.rect.y = 0
+        elif self.rect.y > SCREEN_HEIGHT-self.image.get_height():
+            self.rect.y = SCREEN_HEIGHT-self.image.get_height()
 
     def update(self) -> None:
         if self.dead == False:
+            self.do_movement(self.move(self.x_move_amount, self.y_move_amount))
             self.renderHP()
             self.move(self.player_move,0)
             self.check_hits()

@@ -13,7 +13,7 @@ class BulletManager():
     def __init__(self, engine: Engine):
         pygame.init()
         self.screen = engine.screen
-        self.projectiles = []
+        self.projectiles: List[Bullet] = []
 
     def add_projectile(self, projectile: Bullet) -> None:
         self.projectiles.append(projectile)

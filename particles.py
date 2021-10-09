@@ -14,7 +14,7 @@ class ParticlePrinciple():
         pygame.init()
         self.screen = engine.screen
         self.particles = []
-
+        #List[Tuple[Tuple[int,int],float,int,Tuple[int,int,int]]]
     def emit(self) -> None:
         if self.particles:
             self.delete_particles()
@@ -33,6 +33,7 @@ class ParticlePrinciple():
         direction = 4
         color = random.choice(STAR_COLORS)
         particle_cicle = [[pos_x,pos_y], radius, direction, color]
+        #Tuple[int,int], float, int, Tuple[int,int,int]
         self.particles.append(particle_cicle)
 
     def delete_particles(self) -> None:
