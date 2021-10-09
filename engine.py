@@ -1,8 +1,9 @@
-import sys, pygame
+import sys, pygame, random
 from pygame.color import Color
 
 from render import screen
 from entity import Player, Alien
+from enemy_spawner import EnemySpawner
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from space_map import Star
 from particles import ParticlePrinciple
@@ -22,7 +23,10 @@ class Engine():
     alienIcon = pygame.transform.flip(pygame.image.load('resources/enemy.png'), False, True)
     alienX = (SCREEN_WIDTH/2 - alienIcon.get_width()/2)-400
     alienY = 100
-    alien_speed = 2
+    alien_speed = 10
+
+    #Spawner
+    spawnerIcon = pygame.image.load('resources/space-station.png')
 
     all_sprites = pygame.sprite.Group()
     alien_sprites = pygame.sprite.Group()
@@ -42,12 +46,13 @@ class Engine():
 
     def make_aliens(self, num):
         for x in range(num):
-            self.aliens.append(Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX+((x+1)*100), self.alienY))
+            alien = Alien(self, screen, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY)
+            self.aliens.append(EnemySpawner(self, self.spawnerIcon, (random.randint(0,800),random.randint(0,400)), alien, 100, -1))
             self.all_sprites.add(self.aliens[x])
             self.alien_sprites.add(self.aliens[x])
 
     def run_game(self):
-        self.make_aliens(5)
+        self.make_aliens(3)
 
         while 1:
             for event in pygame.event.get():

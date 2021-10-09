@@ -61,7 +61,7 @@ class Alien(SpaceActor):
         self.fire_rate = fire_rate
         self.timer = fire_rate
         self.y_timer = 0
-        self.fp = Flightpath((0,300))
+        self.fp = Flightpath(1,(0,300))
 
     def shoot(self):
         if self.timer == self.fire_rate:
@@ -69,6 +69,11 @@ class Alien(SpaceActor):
             bullet = Bullet(self.bullet_manager, self.rect.x+(self.image.get_width()/2), self.rect.y+self.image.get_height(), 10, ALIEN_GUN)
             self.bullet_manager.add_projectile(bullet)
         else: self.timer+=1
+
+    def spawn(self, coords):
+        x, y = coords
+        new_alien = Alien(self.engine, self.screen, self.image, self.speed, self.fire_rate, x, y)
+        return new_alien
 
     # def move(self):
     #     x_amount = 0
