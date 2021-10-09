@@ -11,7 +11,8 @@ import copy
 from debug import debug
 
 class EnemySpawner(pygame.sprite.Sprite):
-    def __init__(self, engine: Engine, icon, coords: Tuple[int,int], enemy: Alien, delay: int, num_to_spawn: int = -1):
+    #num_to_spawn set to -1 for infinite. immediate to True to have the first enemy deploy on the first tick
+    def __init__(self, engine: Engine, icon, coords: Tuple[int,int], enemy: Alien, delay: int, num_to_spawn: int = -1, immediate: bool = False):
         pygame.sprite.Sprite.__init__(self)
         self.image = icon
         self.rect = self.image.get_rect()
@@ -20,21 +21,25 @@ class EnemySpawner(pygame.sprite.Sprite):
         self.enemy = enemy
         self.delay = delay
         self.num_to_spawn = num_to_spawn
+        self.immediate = immediate
         self.generator_iterator = self.spawn_enemy()
 
     def __next__(self) -> Optional[SpaceActor]:
         return next(self.generator_iterator)
 
     def spawn_enemy(self) -> Iterator[Optional[SpaceActor]]:
-        current_timer = 0
-        while self.num_to_spawn > 0 or self.num_to_spawn == -1:
+        current_timer = self.delay if self.immediate else 0
+        while self.num_to_spawn >= 0 or self.num_to_spawn == -1:
             if current_timer == self.delay:
                 current_timer = 0
                 new_enemy = self.enemy.spawn((self.rect.x, self.rect.y))
                 yield new_enemy
-                if self.num_to_spawn != -1: self.num_to_spawn -= 1
+                if self.num_to_spawn == 1: current_timer = -1 #Lock out loop on last enemy
+                if self.num_to_spawn != -1: self.num_to_spawn -= 1 #reduce number to spawn
+            elif current_timer == -1: #Lock out timer and spawning
+                yield None
             else:
-                current_timer += 1
+                current_timer += 1 #iterate timer
                 yield None
 
     def update(self) -> None:

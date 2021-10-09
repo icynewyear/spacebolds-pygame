@@ -58,12 +58,12 @@ class Engine():
     def make_aliens(self, num: int) -> None:
         for x in range(num):
             alien = Alien(self, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY)
-            self.aliens.append(EnemySpawner(self, self.spawnerIcon, (random.randint(0,800),random.randint(0,400)), alien, 100, -1))
+            self.aliens.append(EnemySpawner(self, self.spawnerIcon, (random.randint(0,800),random.randint(0,400)), alien, 100, 4, True))
             self.all_sprites.add(self.aliens[x])
             self.alien_sprites.add(self.aliens[x])
 
     def run_game(self) -> None:
-        self.make_aliens(3)
+        self.make_aliens(12)
 
         while 1:
             for event in pygame.event.get():
