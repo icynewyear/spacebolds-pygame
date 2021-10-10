@@ -9,8 +9,9 @@ from entity import Player, Alien
 from enemy_spawner import EnemySpawner
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from particles import ParticlePrinciple
-from backgrounds import Background
+from backgrounds import ParticleBackground, FlatColorBackgroud
 from space_map import SpaceMap, SpaceEvent
+from colors import *
 
 from debug import debug
 
@@ -47,41 +48,34 @@ class Engine():
         self.bg_color = Color(46, 79, 79)
         self.clock = pygame.time.Clock()
         self.particle1 = ParticlePrinciple(self)
-        self.PARTICLE_EVENT = pygame.USEREVENT + 1
-        pygame.time.set_timer(self.PARTICLE_EVENT, 40)
+
         self.player_move = 0
         self.aliens = []
         self.player = Player(self, self.playerIcon, self.player_speed, self.playerX, self.playerY)
         self.all_sprites.add(self.player)
+
         self.alien = Alien(self, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY)
         self.spawner = EnemySpawner(self, self.spawnerIcon, (random.randint(0,800),random.randint(0,400)), self.alien, 100, 4, True)
+        self.particle_bg = ParticleBackground(self)
         self.script = [
-            (0, SpaceEvent.SET_BACKGROUND, -1, None),
+            (0, SpaceEvent.CHANGE_BACKGROUND, -1, self.particle_bg),
+            (50, SpaceEvent.CHANGE_BACKGROUND, -1, FlatColorBackgroud(self, BLACK)),
             (0, SpaceEvent.CHANGE_SPEED, 1, None),
             (35, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (400,80)),
             (36, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (300,80)),
             (37, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (500,80)),
+            (100, SpaceEvent.CHANGE_BACKGROUND, -1 , FlatColorBackgroud(self, (46, 79, 79))),
+            (500, SpaceEvent.CHANGE_BACKGROUND, -1, self.particle_bg),
             (200, SpaceEvent.CHANGE_SPEED, 10, None),
             (300, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (80,300)),
-            (300, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (10,300)),
-            (300, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (640,300)),
-            (300, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (730,300)),
-            (500, SpaceEvent.SPAWN_ENEMY, -1, self.alien, (640,300)),
-            (500, SpaceEvent.SPAWN_ENEMY, -1, self.alien, (730,300)),
+            #(400, SpaceEvent.CHANGE_POS, 100),
+            (500, SpaceEvent.SPAWN_ENEMY, -1, self.alien, (640,0)),
+            (500, SpaceEvent.SPAWN_ENEMY, -1, self.alien, (730,0)),
             ]
         self.map = SpaceMap(self, self.script, 2000, 5)
 
-
-    def make_aliens(self, num: int) -> None:
-        for x in range(num):
-            alien = Alien(self, self.alienIcon, self.alien_speed, 10, self.alienX, self.alienY)
-            self.aliens.append(self.spawner)
-            self.all_sprites.add(self.aliens[x])
-            self.alien_sprites.add(self.aliens[x])
-
     def run_game(self) -> None:
-        #self.make_aliens(1)
-
+        """Core Game Loop"""
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()

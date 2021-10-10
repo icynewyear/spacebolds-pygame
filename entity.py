@@ -56,7 +56,7 @@ class Alien(SpaceActor):
             self.bullet_manager.add_projectile(bullet)
         else: self.timer+=1
 
-    def spawn(self, coords: Tuple[int,int]) -> Alien:
+    def spawn(self, coords: Tuple[int,int], multivar = -1) -> Alien:
         x, y = coords
         new_alien = Alien(self.engine, self.image, self.speed, self.fire_rate, x, y)
         return new_alien

@@ -50,7 +50,7 @@ class EnemySpawner(pygame.sprite.Sprite):
             self.engine.alien_sprites.add(enemy)
             self.engine.all_sprites.add(enemy)
 
-    def spawn(self, coords):
+    def spawn(self, coords, multivar = -1):
         x, y = coords
         new_spawner = EnemySpawner(self.engine, self.image, (x,y), self.enemy, self.delay, self.num_to_spawn, self.immediate)
         return new_spawner

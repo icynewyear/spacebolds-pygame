@@ -17,14 +17,16 @@ from settings import SCREEN_HEIGHT
 class SpaceEvent(Enum):
     """Enums for events for building a space level script"""
     #Utility
-    SET_BACKGROUND = auto()
+    CHANGE_BACKGROUND = auto()
     CHANGE_SPEED = auto()
+    CHANGE_POS = auto()
+
     #Spawning
     SPAWN_ENEMY = auto()
     SPAWN_SPAWNER = auto()
 
 class SpaceMap():
-    """Handles the functions of a speace level map.  script list of Tuples (distancestamp_to_fire_event, event_type, int_var_for_event[-1 for none], entity_for_event[None for none])"""
+    """Handles the functions of a space level map.  script list of Tuples (distancestamp_to_fire_event, event_type, int_var_for_event[-1 for none], entity_for_event[None for none])"""
     def __init__(self, engine: Engine, script, length: int = 0, scroll_speed: int = 1, pos: int = 0):
         self.engine = engine
         self.screen = engine.screen
@@ -33,52 +35,67 @@ class SpaceMap():
         self.pos = pos
         self.last_pos = pos
         self.script = script
+        self.last_bg = None
         self.script_init(self.script)
 
-    def script_init(self, script):
+    def script_init(self, script) -> None:
         """Method to process any script commands with a distancestamp below 1"""
         init_events = [event for event in self.script if event[0] <= 0]
-        print(init_events)
         if init_events: self.do_step(init_events)
 
-    def step(self):
-        """Compare internal position to script, do any events at this time step. iterate internal position"""
-        events_to_fire = [event for event in self.script if event[0] == self.pos or (self.pos != self.last_pos and (event[0] < self.pos and event[0] > self.last_pos))]
+    def step(self) -> None:
+        """Compare internal position to script, do any events during that time step. sets last internal position"""
+        events_to_fire = [event for event in self.script if event[0] == self.pos or (event[0] < self.pos and event[0] > self.last_pos)]
         self.last_pos = self.pos
+        print(events_to_fire)
         if events_to_fire: self.do_step(events_to_fire)
 
-    def do_step(self, events_to_fire):
+    def do_step(self, events_to_fire) -> None:
         """Method to call appropriate methods when passed a list of SpaceEvents to process"""
         for event in events_to_fire:
-            if event[1] == SpaceEvent.SET_BACKGROUND:
+            if event[1] == SpaceEvent.CHANGE_BACKGROUND:
                 self.set_background(event)
             elif event[1] == SpaceEvent.CHANGE_SPEED:
                 self.set_speed(event)
+            elif event[1] == SpaceEvent.CHANGE_POS:
+                self.set_pos(event)
             elif event[1] == SpaceEvent.SPAWN_SPAWNER or SpaceEvent.SPAWN_ENEMY:
-                self.spawn(event[3],event[2], event[4])
+                self.spawn(event[3], event[2], event[4])
 
-    def update(self):
+    def update(self) -> None:
         """Method called to run the gamemap 1 tick"""
-        self.renderProgessBar()
         self.pos += self.scroll_speed
-        debug(self.scroll_speed)
         self.step()
+        self.render()
 
-    def set_background(self, event):
-        """Method to process SET_BACKGROUND events"""
-        pass
+    def set_background(self, event) -> None:
+        """Method to process CHANGE_BACKGROUND events"""
+        if self.last_bg != None: self.last_bg.stop()
+        event[3].setup()
+        self.last_bg = event[3]
 
-    def set_speed(self, event):
+    def set_speed(self, event) -> None:
+        """Method to process CHANGE_SPEED events. Sets Scroll Speed to multiuse Var value"""
         self.scroll_speed = event[2]
 
-    def spawn(self, entity, numeric_var, coords):
-        """Method to process SPAWN_ events and spawn entities"""
-        new_spawner = entity.spawn(coords)
-        self.engine.alien_sprites.add(new_spawner)
-        self.engine.all_sprites.add(new_spawner)
+    def set_pos(self, event) -> None:
+        """Method to process CHANGE_POS events. Sets Position to multiuse Var value"""
+        self.pos = event[2]
 
-    def renderProgessBar(self):
+    def spawn(self, entity: SpaceEntity, multivar: int, coords: Tuple[int,int]) -> None:
+        """Method to process SPAWN_ events and spawn entities. Passes multivar to spawn method of entity"""
+        ### TODO: Perhaps collapse SPAWN_ENEMY and SPAWN_SPAWNER?
+        new_entity = entity.spawn(coords, multivar)
+        self.engine.alien_sprites.add(new_entity)
+        self.engine.all_sprites.add(new_entity)
+
+    def renderProgessBar(self) -> None:
         """Method to render a progress bar on the side of the screen"""
         progress_display = int((self.pos/self.length)*SCREEN_HEIGHT)
         pygame.draw.rect(self.screen, RED, (0, 0, 5, SCREEN_HEIGHT))
         pygame.draw.rect(self.screen, BLUE, (0, SCREEN_HEIGHT-progress_display, 5, progress_display))
+
+    def render(self) -> None:
+        """Method to render gamemap elements to screen"""
+        debug(self.pos)
+        self.renderProgessBar()
