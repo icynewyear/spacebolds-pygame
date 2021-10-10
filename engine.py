@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 import sys, pygame, random
 from pygame.color import Color
 
-from entity import Player, Alien
+from entity import Alien
+from player import Player
 from enemy_spawner import EnemySpawner
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from particles import ParticlePrinciple
@@ -64,6 +65,8 @@ class Engine():
             (35, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (400,80)),
             (36, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (300,80)),
             (37, SpaceEvent.SPAWN_SPAWNER, -1, self.spawner, (500,80)),
+            (300, SpaceEvent.PLAY_SOUND, -1, pygame.mixer.Sound('resources/burp.ogg')),
+            (300, SpaceEvent.PLAY_MUSIC, 2, 'resources/galactictrek.wav'),
             (100, SpaceEvent.CHANGE_BACKGROUND, -1 , FlatColorBackgroud(self, (46, 79, 79))),
             (500, SpaceEvent.CHANGE_BACKGROUND, -1, self.particle_bg),
             (200, SpaceEvent.CHANGE_SPEED, 10, None),

@@ -55,7 +55,6 @@ class ParticleBackground(Background):
         """called by Spacemap to remove this background"""
         pygame.time.set_timer(self.engine.PARTICLE_EVENT, 0)
 
-
 # class ScrollingImageBackground(Background):
 #     def __init__(self):
 #         self.bgimage = pygame.image.load('')

@@ -21,6 +21,10 @@ class SpaceEvent(Enum):
     CHANGE_SPEED = auto()
     CHANGE_POS = auto()
 
+    #Sound
+    PLAY_MUSIC = auto()
+    PLAY_SOUND = auto()
+
     #Spawning
     SPAWN_ENEMY = auto()
     SPAWN_SPAWNER = auto()
@@ -59,6 +63,10 @@ class SpaceMap():
                 self.set_speed(event)
             elif event[1] == SpaceEvent.CHANGE_POS:
                 self.set_pos(event)
+            elif event[1] == SpaceEvent.PLAY_MUSIC:
+                self.play_music(event)
+            elif event[1] == SpaceEvent.PLAY_SOUND:
+                self.play_sound(event)
             elif event[1] == SpaceEvent.SPAWN_SPAWNER or SpaceEvent.SPAWN_ENEMY:
                 self.spawn(event[3], event[2], event[4])
 
@@ -88,6 +96,16 @@ class SpaceMap():
         new_entity = entity.spawn(coords, multivar)
         self.engine.alien_sprites.add(new_entity)
         self.engine.all_sprites.add(new_entity)
+
+    def play_music(self,event) -> None:
+        """Method to process PLAY_MUSIC events. Plays supplied song. event[2] = number of loops. -1 for infinite"""
+        pygame.mixer.music.load(event[3])
+        pygame.mixer.music.play(event[2])
+
+    def play_sound(self, event) -> None:
+        """Method to process PLAY_SOUND events. Plays supplied sound effect."""
+        new_sound = event[3]
+        new_sound.play()
 
     def renderProgessBar(self) -> None:
         """Method to render a progress bar on the side of the screen"""
