@@ -10,6 +10,8 @@ import copy
 
 from debug import debug
 
+pygame.init()
+
 class EnemySpawner(pygame.sprite.Sprite):
     #num_to_spawn set to -1 for infinite. immediate to True to have the first enemy deploy on the first tick
     def __init__(self, engine: Engine, icon, coords: Tuple[int,int], enemy: Alien, delay: int, num_to_spawn: int = -1, immediate: bool = False):
@@ -47,3 +49,8 @@ class EnemySpawner(pygame.sprite.Sprite):
         if enemy != None:
             self.engine.alien_sprites.add(enemy)
             self.engine.all_sprites.add(enemy)
+
+    def spawn(self, coords):
+        x, y = coords
+        new_spawner = EnemySpawner(self.engine, self.image, (x,y), self.enemy, self.delay, self.num_to_spawn, self.immediate)
+        return new_spawner
